@@ -7,17 +7,25 @@ class UserRepository {
       password,
     });
   };
+  
   findByUser = async (nickname) => {
     const user = await User.findAll({
       where: {
         nickname,
       },
     });
-
     return user;
   };
 
-  return;
+  userLogin = async (nickname, password) => {
+    const user = await User.findOne({
+      where: {
+        nickname,
+        password,
+      },
+    });
+    return user;
+  };
 }
 
 module.exports = UserRepository;
