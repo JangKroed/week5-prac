@@ -44,13 +44,13 @@ class UsersController {
       const token = jwt.sign(
         { userId: user.userId, nickname: user.nickname },
         process.env.SECRET_KEY,
-        { expiresIn: '10m' }
+        { expiresIn: '1d' }
       );
 
       res.cookie(process.env.COOKIE_NAME, `Bearer ${token}`, {
         expires: expires,
       });
-      
+
       res.send({
         token: token,
       });
