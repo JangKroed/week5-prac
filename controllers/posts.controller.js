@@ -81,6 +81,38 @@ class PostsController {
       res.status(400).send({ message: error.message });
     }
   };
+
+  toggleLike = async (req, res, next) => {
+    try {
+      const { postId } = req.params;
+      const { user } = res.locals;
+      const userId = user.userId;
+      const likeId = await this.postService.findByLike(postId, userId);
+
+      if (!likeId) {
+        await this.postService.createLike(postId, userId);
+        res.status(200).send({ message: '게시글의 좋아요를 등록하였습니다.' });
+      } else {
+        await this.postService.destroyLike(postId, userId);
+        res.status(200).send({ message: '게시글의 좋아요를 취소하였습니다.' });
+      }
+    } catch (error) {
+      res.status(400).send({ message: error.message });
+    }
+  };
+
+  getLikePost = async (req, res, next) => {
+    try {
+      const { user } = res.locals;
+      const userId = user.userId;
+
+      const likePosts = await this.postService.likePosts(userId);
+
+      res.status(200).json({ data: likePosts });
+    } catch (error) {
+      res.status(400).send({ message: error.message });
+    }
+  };
 }
 
 module.exports = PostsController;

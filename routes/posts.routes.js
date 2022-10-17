@@ -10,10 +10,8 @@ router
   .get(postsController.getPost)
   .post(Auth, postsController.createPost);
 
-// router
-//   .route('/like')
-//   .get(postsController.getLikePost)
-//   .put('/:postId', postsController.likePost);
+router.get('/like', Auth, postsController.getLikePost);
+router.put('/:postId/like', Auth, postsController.toggleLike);
 
 router
   .route('/:postId')

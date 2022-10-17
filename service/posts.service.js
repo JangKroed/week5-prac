@@ -1,4 +1,5 @@
 const PostRepository = require('../repositories/posts.repository');
+const { post } = require('../routes');
 
 class PostService {
   postRepository = new PostRepository();
@@ -54,6 +55,30 @@ class PostService {
     } catch (error) {
       res.status(400).send({ message: error.message });
     }
+  };
+
+  findByLike = async (postId, userId) => {
+    const userDB = await this.postRepository.findByLike(postId, userId);
+
+    return userDB;
+  };
+
+  likePosts = async (userId) => {
+    // 유저가 누른 좋아요테이블 리스트
+    const likePosts = await this.postRepository.likePosts(userId);
+    // 유저가 누른 좋아요 테이블의 userId 배열
+    const likeUserIds = likePosts.map((like) => like.postId);
+    const result = await this.postRepository.getLikePosts(likeUserIds);
+
+    return result;
+  };
+
+  createLike = async (postId, userId) => {
+    await this.postRepository.createLike(postId, userId);
+  };
+
+  destroyLike = async (postId, userId) => {
+    await this.postRepository.destroyLike(postId, userId);
   };
 }
 

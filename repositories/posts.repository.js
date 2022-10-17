@@ -1,4 +1,4 @@
-const { Post } = require('../models');
+const { Post, Like } = require('../models');
 // 여기 많아지면 안됨 ?
 class PostRepository {
   createPost = async (result) => {
@@ -38,6 +38,51 @@ class PostRepository {
         postId,
       },
     });
+  };
+
+  findByLike = async (postId, userId) => {
+    const userDB = await Like.findOne({
+      where: {
+        postId,
+        userId,
+      },
+    });
+
+    return userDB;
+  };
+
+  likePosts = async (userId) => {
+    const likePosts = await Like.findAll({
+      where: { userId },
+    });
+
+    return likePosts;
+  };
+
+  getLikePosts = async (likeUserIds) => {
+    const result = await Post.findAll({
+      where: { postId: likeUserIds },
+      attributes: {
+        exclude: ['content'],
+      },
+    });
+
+    return result;
+  };
+
+  createLike = async (postId, userId) => {
+    await Like.create({
+      postId,
+      userId,
+    });
+    await Post.increment({ likes: 1 }, { where: { postId } });
+  };
+
+  destroyLike = async (postId, userId) => {
+    await Like.destroy({
+      where: { postId, userId },
+    });
+    await Post.increment({ likes: -1 }, { where: { postId } });
   };
 }
 
