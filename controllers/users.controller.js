@@ -42,7 +42,6 @@ class UsersController {
       const user = await this.userService.findByUser(nickname);
 
       const isEqualPw = await bcrypt.compare(password, user.password);
-      console.log(isEqualPw);
 
       if (!user || !isEqualPw)
         throw new Error('닉네임 또는 패스워드를 확인해주세요');
