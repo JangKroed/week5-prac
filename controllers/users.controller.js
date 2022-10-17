@@ -19,7 +19,7 @@ class UsersController {
 
       const existUser = await this.userService.findByUser(nickname);
 
-      if (existUser.length) throw new Error('중복된 닉네임 입니다.');
+      if (existUser) throw new Error('중복된 닉네임 입니다.');
 
       await this.userService.createUser(nickname, password);
 
@@ -31,11 +31,14 @@ class UsersController {
 
   userLogin = async (req, res, next) => {
     try {
-      const { nickname } = await joi.loginSchema.validateAsync(req.body);
+      const { nickname, password } = await joi.loginSchema.validateAsync(
+        req.body
+      );
 
       const user = await this.userService.findByUser(nickname);
 
-      if (!user) throw new Error('닉네임 또는 패스워드를 확인해주세요');
+      if (!user || user.password !== password)
+        throw new Error('닉네임 또는 패스워드를 확인해주세요');
 
       const expires = new Date();
 
