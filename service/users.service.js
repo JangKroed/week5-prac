@@ -3,7 +3,9 @@ const UserRepository = require('../repositories/Users.repository');
 class UserService {
   userRepository = new UserRepository();
 
-  createUser = async (nickname, password) => {
+  createUser = async (users) => {
+    const { nickname, password } = users;
+
     await this.userRepository.createUser(nickname, password);
 
     return;
