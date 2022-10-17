@@ -10,6 +10,7 @@ class PostRepository {
       attributes: {
         exclude: ['content'],
       },
+      order: [['createdAt', 'desc']],
     });
     return postsData;
   };
@@ -65,6 +66,7 @@ class PostRepository {
       attributes: {
         exclude: ['content'],
       },
+      order: [['likes', 'desc']],
     });
 
     return result;
