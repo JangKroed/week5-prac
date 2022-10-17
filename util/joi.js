@@ -25,25 +25,10 @@ module.exports = {
       .min(3)
       .alphanum()
       .required()
-      .error(new Error('닉네임이 올바르지 않습니다.')),
+      .error(new Error('닉네임 또는 패스워드를 확인해주세요.')),
     password: Joi.string()
       .min(4)
       .required()
-      .error(new Error('비밀번호가 올바르지 않습니다.')),
-  }),
-
-  postSchema: Joi.object({
-    title: Joi.string().required().messages({
-      'string.empty': '제목을 입력해주세요.',
-    }),
-    content: Joi.string().required().messages({
-      'string.empty': '게시글 내용을 입력해주세요.',
-    }),
-  }),
-
-  commentSchema: Joi.object({
-    comment: Joi.string().required().messages({
-      'string.empty': '댓글 내용을 입력해주세요.',
-    }),
+      .error(new Error('닉네임 또는 패스워드를 확인해주세요.')),
   }),
 };
