@@ -35,7 +35,7 @@ class CommentsController {
 
       const getCommentId = await this.commentService.getCommentId(commentId);
 
-      if (!comment) throw new Error('댓글을 작성해주세요.');
+      if (!comment) throw new Error('댓글 내용을 입력해주세요.');
 
       if (!getCommentId) throw new Error('수정할 댓글이 없습니다.');
 
