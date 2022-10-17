@@ -10,7 +10,7 @@ class PostsController {
       if (!title || !content) throw new Error('게시글 작성에 실패하였습니다.');
 
       await this.postService.createPost(req, res);
-      res.status(200).json({ message: '게시글 작성에 성공하였습니다.' });
+      res.status(200).send({ message: '게시글 작성에 성공하였습니다.' });
     } catch (error) {
       res.status(400).send({ message: error.message });
     }
