@@ -48,11 +48,16 @@ class UsersController {
    */
   userLogin = async (req, res, next) => {
     try {
-    // 로그인 정보 입력 검증
+      // 로그인 정보 입력 검증
       await joi.loginSchema.validateAsync(req.body);
 
       // 유저 정보를 service로 전달
       const token = await this.userService.userLogin(req, res);
+      const expires = new Date();
+      expires.setMinutes(expires.getMinutes() + 60);
+      res.cookie(process.env.COOKIE_NAME, `Bearer ${token}`, {
+        expires: expires,
+      });
 
       // response로 token을 전달
       res.send({

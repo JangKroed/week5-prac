@@ -20,13 +20,9 @@ class PostService {
   };
 
   getPost = async () => {
-    try {
-      const postsData = await this.postRepository.getPost();
+    const postsData = await this.postRepository.getPost();
 
-      return postsData;
-    } catch (error) {
-      res.status(error.status || 400).send({ message: error.message });
-    }
+    return postsData;
   };
 
   findByPost = async (postId) => {
@@ -38,6 +34,7 @@ class PostService {
   updatePost = async (req, res) => {
     const { postId } = req.params;
     const { user } = res.locals;
+    
     // 존재하는 게시글인지 repository에서 찾아온다
     const findPost = await this.postRepository.findByPost(postId);
     if (!findPost) throw new Error('존재하지 않는 게시글입니다.');
@@ -67,10 +64,11 @@ class PostService {
     const { postId } = req.params; // 좋아요를 하려는 게시글
     // 존재하는 게시글인지 검증
     const findPost = await this.postRepository.findByPost(postId);
-    if (!findPost)
-      throw new Error('존재하지 않는 게시글입니다.');
+    if (!findPost) throw new Error('존재하지 않는 게시글입니다.');
+
     const { user } = res.locals; // 로그인된 유저정보
     const userId = user.userId; // 로그인된 유저의 ID
+
     const isLike = await this.postRepository.isLike(postId, userId); // 해당 유저가 해당 게시글에 좋아요를 눌렀는지 DB에 확인
     if (!isLike) {
       await this.postRepository.createLike(postId, userId);
@@ -84,6 +82,7 @@ class PostService {
   likePosts = async (userId) => {
     // 유저가 누른 좋아요테이블 리스트
     const likePosts = await this.postRepository.likePosts(userId);
+
     // 유저가 누른 좋아요 테이블의 userId 배열
     const likeUserIds = likePosts.map((like) => like.postId);
     const result = await this.postRepository.getLikePosts(likeUserIds);

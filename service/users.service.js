@@ -40,18 +40,13 @@ class UserService {
     const isEqualPw = await bcrypt.compare(password, userDB.password);
     if (!isEqualPw) throw new Error('닉네임 또는 패스워드를 확인해주세요');
 
-    const expires = new Date();
-    expires.setMinutes(expires.getMinutes() + 60);
+    
 
     const token = jwt.sign(
       { userId: userDB.userId, nickname: userDB.nickname },
       process.env.SECRET_KEY,
       { expiresIn: '1d' }
     );
-
-    res.cookie(process.env.COOKIE_NAME, `Bearer ${token}`, {
-      expires: expires,
-    });
 
     return token;
   };
