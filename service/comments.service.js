@@ -6,9 +6,7 @@ class CommentService {
   postRepository = new PostRepository();
 
   createComment = async (req, res, next) => {
-    // 댓글 내용 검증
     const { comment } = req.body;
-    if (!comment) throw new Error('댓글을 입력해주세요.');
 
     // 게시글이 있는지 검증
     const { postId } = req.params;
@@ -48,7 +46,6 @@ class CommentService {
     const { commentId } = req.params;
     const { user } = res.locals;
     const { comment } = req.body;
-    if (!comment) throw new Error('댓글 내용을 입력해주세요.');
 
     // 존재하는 댓글인지 검증
     const getCommentId = await this.commentRepository.getCommentId(commentId);

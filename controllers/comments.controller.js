@@ -5,7 +5,7 @@ class CommentsController {
   createComment = async (req, res, next) => {
     try {
       const { comment } = req.body;
-      if (!comment) throw new Error('댓글 작성에 실패하였습니다.');
+      if (!comment) throw new Error('댓글을 입력해주세요.');
 
       await this.commentService.createComment(req, res);
 
@@ -29,6 +29,8 @@ class CommentsController {
 
   updateComment = async (req, res, next) => {
     try {
+      const { comment } = req.body;
+      if (!comment) throw new Error('댓글 내용을 입력해주세요.');
       await this.commentService.updateComment(req, res);
 
       res.status(200).send({
