@@ -11,7 +11,7 @@ class CommentsController {
 
       res.status(200).send({ message: '댓글 작성에 성공하였습니다.' });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
@@ -23,7 +23,7 @@ class CommentsController {
         data: comments,
       });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
@@ -48,7 +48,7 @@ class CommentsController {
         message: '댓글이 수정되었습니다.',
       });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
@@ -67,7 +67,7 @@ class CommentsController {
 
       res.status(200).send({ message: '댓글이 삭제되었습니다.' });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 }

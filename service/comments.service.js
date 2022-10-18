@@ -4,23 +4,19 @@ class CommentService {
   commentRepository = new CommentRepository();
 
   createComment = async (req, res, next) => {
-    try {
-      const { comment } = req.body;
-      const { postId } = req.params;
-      const { user } = res.locals;
-      const result = {
-        postId,
-        userId: user.userId,
-        nickname: user.nickname,
-        comment,
-      };
+    const { comment } = req.body;
+    const { postId } = req.params;
+    const { user } = res.locals;
+    const result = {
+      postId,
+      userId: user.userId,
+      nickname: user.nickname,
+      comment,
+    };
 
-      await this.commentRepository.createComment(result);
+    await this.commentRepository.createComment(result);
 
-      return;
-    } catch (error) {
-      res.status(400).send({ message: error.message });
-    }
+    return;
   };
 
   getComment = async (req, res) => {
@@ -38,24 +34,16 @@ class CommentService {
   };
 
   updateComment = async (req, res, next) => {
-    try {
-      const { commentId } = req.params;
-      const { comment } = req.body;
+    const { commentId } = req.params;
+    const { comment } = req.body;
 
-      await this.commentRepository.updateComment(commentId, comment);
-    } catch (error) {
-      res.status(400).send({ message: error.message });
-    }
+    await this.commentRepository.updateComment(commentId, comment);
   };
 
   destroyComment = async (req, res, next) => {
-    try {
-      const { commentId } = req.params;
+    const { commentId } = req.params;
 
-      await this.commentRepository.destroyComment(commentId);
-    } catch (error) {
-      res.status(400).send({ message: error.message });
-    }
+    await this.commentRepository.destroyComment(commentId);
   };
 }
 

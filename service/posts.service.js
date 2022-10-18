@@ -1,27 +1,22 @@
 const PostRepository = require('../repositories/posts.repository');
-const { post } = require('../routes');
 
 class PostService {
   postRepository = new PostRepository();
 
   createPost = async (req, res, next) => {
-    try {
-      const { title, content } = req.body;
-      const { user } = res.locals;
-      const result = {
-        userId: user.userId,
-        nickname: user.nickname,
-        title,
-        content,
-        likes: 0,
-      };
+    const { title, content } = req.body;
+    const { user } = res.locals;
+    const result = {
+      userId: user.userId,
+      nickname: user.nickname,
+      title,
+      content,
+      likes: 0,
+    };
 
-      await this.postRepository.createPost(result);
+    await this.postRepository.createPost(result);
 
-      return;
-    } catch (error) {
-      res.status(400).send({ message: error.message });
-    }
+    return;
   };
 
   getPost = async () => {
@@ -30,7 +25,7 @@ class PostService {
 
       return postsData;
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
@@ -41,26 +36,49 @@ class PostService {
   };
 
   updatePost = async (req, res) => {
-    try {
-      await this.postRepository.updatePost(req, res);
-    } catch (error) {
-      res.status(400).send({ message: error.message });
-    }
+    const { postId } = req.params;
+    const { user } = res.locals;
+    // 존재하는 게시글인지 repository에서 찾아온다
+    const findPost = await this.postRepository.findByPost(postId);
+    if (!findPost) throw new Error('존재하지 않는 게시글입니다.');
+
+    // 게시한 유저와 로그인한 유저가 일치하는지 검증
+    if (user.userId !== findPost.userId)
+      throw new Error('로그인된 사용자와 게시자가 다릅니다.');
+
+    // repository로 보낼 데이터 가공
+    const { title, content } = req.body;
+    await this.postRepository.updatePost(title, content, postId);
   };
 
   destroyPost = async (req, res) => {
-    try {
-      const { postId } = req.params;
-      await this.postRepository.destroyPost(postId);
-    } catch (error) {
-      res.status(400).send({ message: error.message });
-    }
+    const { postId } = req.params;
+    const { user } = res.locals;
+    const findPost = await this.postRepository.findByPost(postId);
+
+    if (!findPost) throw new Error('존재하지 않는 게시글입니다.');
+    if (user.userId !== findPost.userId)
+      throw new Error('로그인된 사용자와 게시자가 다릅니다.');
+
+    await this.postRepository.destroyPost(postId);
   };
 
-  findByLike = async (postId, userId) => {
-    const userDB = await this.postRepository.findByLike(postId, userId);
-
-    return userDB;
+  toggleLike = async (req, res) => {
+    const { postId } = req.params; // 좋아요를 하려는 게시글
+    // 존재하는 게시글인지 검증
+    const findPost = await this.postRepository.findByPost(postId);
+    if (!findPost)
+      throw new Error('존재하지 않는 게시글입니다.');
+    const { user } = res.locals; // 로그인된 유저정보
+    const userId = user.userId; // 로그인된 유저의 ID
+    const isLike = await this.postRepository.isLike(postId, userId); // 해당 유저가 해당 게시글에 좋아요를 눌렀는지 DB에 확인
+    if (!isLike) {
+      await this.postRepository.createLike(postId, userId);
+      res.status(200).send({ message: '게시글의 좋아요를 등록하였습니다.' });
+    } else {
+      await this.postRepository.destroyLike(postId, userId);
+      res.status(200).send({ message: '게시글의 좋아요를 취소하였습니다.' });
+    }
   };
 
   likePosts = async (userId) => {
@@ -71,14 +89,6 @@ class PostService {
     const result = await this.postRepository.getLikePosts(likeUserIds);
 
     return result;
-  };
-
-  createLike = async (postId, userId) => {
-    await this.postRepository.createLike(postId, userId);
-  };
-
-  destroyLike = async (postId, userId) => {
-    await this.postRepository.destroyLike(postId, userId);
   };
 }
 
