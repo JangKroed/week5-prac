@@ -10,3 +10,11 @@ test('함수는 2번 호출 됩니다.', () => {
 test('2번째로 호출된 함수에 전달된 첫번째 인수는 1 입니다.', () => {
   expect(mockFn.mock.calls[1][0]).toBe(1);
 });
+
+// jest.mock('./fn');
+// fn.createUser.mockReturnValue({ name: 'Mike' });
+
+// test('유저를 만든다', () => {
+//   const user = fn.createUser('Mike');
+//   expect(user.name).toBe('Mike');
+// });
