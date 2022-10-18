@@ -1,71 +1,65 @@
 const UserService = require('../service/users.service');
 const joi = require('../util/joi');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 class UsersController {
   userService = new UserService();
 
+  /**
+   * 클라이언트로 부터 받은 유저정보를 검증하고 암호화 합니다.
+   * @param {*} req
+   * @param {*} res
+   * @param {*} next
+   */
   createUser = async (req, res, next) => {
     try {
+      // 회원가입 정보 입력 검증
       const { nickname, password, confirm } =
         await joi.signupSchema.validateAsync(req.body);
 
       if (password !== confirm)
         throw new Error('비밀번호가 확인란과 일치하지 않습니다.');
-
+      // 비밀번호가 닉네임에 포함 or 닉네임이 비밀번호에 포함
       if (password.includes(nickname) || nickname.includes(password))
         throw new Error('회원 가입에 실패하였습니다.');
 
-      const existUser = await this.userService.findByUser(nickname);
-
-      if (existUser) throw new Error('중복된 닉네임 입니다.');
-
-      const hashed = await bcrypt.hash(password, 10);
+      // 비밀번호 hash
+      const hashed = await bcrypt.hash(
+        password,
+        Number(process.env.SALT_ROUND)
+      );
       const users = Object.create({ nickname, password: hashed });
 
+      // hash된 유저 정보를 service로 전달
       await this.userService.createUser(users);
 
       res.status(200).json({ message: '회원 가입에 성공하였습니다.' });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
+  /**
+   * 클라이언트로부터 받은 정보를 1차적으로 검증하고 service로 전달합니다.
+   * @param {*} req
+   * @param {*} res
+   * @param {*} next
+   */
   userLogin = async (req, res, next) => {
     try {
-      const { nickname, password } = await joi.loginSchema.validateAsync(
-        req.body
-      );
+    // 로그인 정보 입력 검증
+      await joi.loginSchema.validateAsync(req.body);
 
-      const user = await this.userService.findByUser(nickname);
+      // 유저 정보를 service로 전달
+      const token = await this.userService.userLogin(req, res);
 
-      const isEqualPw = await bcrypt.compare(password, user.password);
-      console.log(isEqualPw);
-
-      if (!user || !isEqualPw)
-        throw new Error('닉네임 또는 패스워드를 확인해주세요');
-
-      const expires = new Date();
-
-      expires.setMinutes(expires.getMinutes() + 60);
-
-      const token = jwt.sign(
-        { userId: user.userId, nickname: user.nickname },
-        process.env.SECRET_KEY,
-        { expiresIn: '1d' }
-      );
-
-      res.cookie(process.env.COOKIE_NAME, `Bearer ${token}`, {
-        expires: expires,
-      });
-
+      // response로 token을 전달
       res.send({
         token: token,
       });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 }

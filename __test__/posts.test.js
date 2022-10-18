@@ -1,12 +1,11 @@
-const mockFn = jest.fn();
-
-mockFn();
-mockFn(1);
-
-test('함수는 2번 호출 됩니다.', () => {
-  expect(mockFn.mock.calls.length).toBe(2);
-});
-
-test('2번째로 호출된 함수에 전달된 첫번째 인수는 1 입니다.', () => {
-  expect(mockFn.mock.calls[1][0]).toBe(1);
+const PostsController = require('../controllers/posts.controller');
+const postsController = new PostsController();
+const req = {
+  body: {
+    title: '',
+    content: '25256',
+  },
+};
+test('제목을 입력하지 않았습니다.', async () => {
+  expect(await postsController.createPost(req)).toThrow('게시글 작성에 실패하였습니다.');
 });
