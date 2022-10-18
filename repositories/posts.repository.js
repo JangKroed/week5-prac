@@ -21,9 +21,7 @@ class PostRepository {
     return post;
   };
 
-  updatePost = async (req, res) => {
-    const { title, content } = req.body;
-    const { postId } = req.params;
+  updatePost = async (title, content, postId) => {
     await Post.update(
       {
         title,
@@ -41,7 +39,7 @@ class PostRepository {
     });
   };
 
-  findByLike = async (postId, userId) => {
+  isLike = async (postId, userId) => {
     const userDB = await Like.findOne({
       where: {
         postId,

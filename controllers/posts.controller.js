@@ -12,7 +12,7 @@ class PostsController {
       await this.postService.createPost(req, res);
       res.status(200).send({ message: '게시글 작성에 성공하였습니다.' });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
@@ -24,7 +24,7 @@ class PostsController {
         data: posts,
       });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
@@ -36,21 +36,16 @@ class PostsController {
         data: post,
       });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
   updatePost = async (req, res, next) => {
     try {
-      const { postId } = req.params;
       const { title, content } = req.body;
-      const { user } = res.locals;
-      const userId = await this.postService.findByPost(postId);
 
-      if (!title || !content || !userId)
-        throw new Error('게시글 수정에 실패하였습니다.');
-      if (user.userId !== userId.userId)
-        throw new Error('로그인된 사용자와 게시자가 다릅니다.');
+      if (!title) throw new Error('제목을 입력해주세요.');
+      if (!content) throw new Error('내용을 입력해주세요.');
 
       await this.postService.updatePost(req, res);
 
@@ -58,46 +53,29 @@ class PostsController {
         message: '게시글이 수정되었습니다.',
       });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400);
+      res.send({ message: error.message });
     }
   };
 
   destroyPost = async (req, res, next) => {
     try {
-      const { postId } = req.params;
-      const { user } = res.locals;
-      const userId = await this.postService.findByPost(postId);
-
-      if (!userId) throw new Error('게시글 삭제에 실패하였습니다.');
-      if (user.userId !== userId.userId)
-        throw new Error('로그인된 사용자와 게시자가 다릅니다.');
-
+      // controller가 검증할 데이터가 없으므로 service로 정보를 그대로 전달
       await this.postService.destroyPost(req, res);
 
       res.status(200).send({
         message: '게시글이 삭제되었습니다.',
       });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
   toggleLike = async (req, res, next) => {
     try {
-      const { postId } = req.params;
-      const { user } = res.locals;
-      const userId = user.userId;
-      const likeId = await this.postService.findByLike(postId, userId);
-
-      if (!likeId) {
-        await this.postService.createLike(postId, userId);
-        res.status(200).send({ message: '게시글의 좋아요를 등록하였습니다.' });
-      } else {
-        await this.postService.destroyLike(postId, userId);
-        res.status(200).send({ message: '게시글의 좋아요를 취소하였습니다.' });
-      }
+      await this.postService.toggleLike(req, res);
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 
@@ -110,7 +88,7 @@ class PostsController {
 
       res.status(200).json({ data: likePosts });
     } catch (error) {
-      res.status(400).send({ message: error.message });
+      res.status(error.status || 400).send({ message: error.message });
     }
   };
 }
