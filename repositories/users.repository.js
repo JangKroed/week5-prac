@@ -8,7 +8,7 @@ class UserRepository {
     });
   };
   findByUser = async (nickname) => {
-    const user = await User.findAll({
+    const user = await User.findOne({
       where: {
         nickname,
       },
@@ -16,8 +16,6 @@ class UserRepository {
 
     return user;
   };
-
-  return;
 }
 
 module.exports = UserRepository;

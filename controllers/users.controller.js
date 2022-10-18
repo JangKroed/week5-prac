@@ -1,6 +1,7 @@
 const UserService = require('../service/users.service');
 const joi = require('../util/joi');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 class UsersController {
@@ -19,9 +20,12 @@ class UsersController {
 
       const existUser = await this.userService.findByUser(nickname);
 
-      if (existUser.length) throw new Error('중복된 닉네임 입니다.');
+      if (existUser) throw new Error('중복된 닉네임 입니다.');
 
-      await this.userService.createUser(nickname, password);
+      const hashed = await bcrypt.hash(password, 10);
+      const users = Object.create({ nickname, password: hashed });
+
+      await this.userService.createUser(users);
 
       res.status(200).json({ message: '회원 가입에 성공하였습니다.' });
     } catch (error) {
@@ -37,15 +41,20 @@ class UsersController {
 
       const user = await this.userService.findByUser(nickname);
 
-      if (!user) throw new Error('닉네임 또는 패스워드를 확인해주세요');
+      const isEqualPw = await bcrypt.compare(password, user.password);
+      console.log(isEqualPw);
+
+      if (!user || !isEqualPw)
+        throw new Error('닉네임 또는 패스워드를 확인해주세요');
 
       const expires = new Date();
+
       expires.setMinutes(expires.getMinutes() + 60);
 
       const token = jwt.sign(
         { userId: user.userId, nickname: user.nickname },
         process.env.SECRET_KEY,
-        { expiresIn: '10m' }
+        { expiresIn: '1d' }
       );
 
       res.cookie(process.env.COOKIE_NAME, `Bearer ${token}`, {

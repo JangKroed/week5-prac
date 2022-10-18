@@ -3,19 +3,18 @@ const UserRepository = require('../repositories/Users.repository');
 class UserService {
   userRepository = new UserRepository();
 
-  findByUser = async (nickname)=>{
-    const findNickname = await this.userRepository.findByUser(nickname)
+  createUser = async (users) => {
+    const { nickname, password } = users;
 
-    return findNickname
-  }
-
-  createUser = async (nickname, password) => {
-    await this.userRepository.createUser(
-      nickname,
-      password,
-    );
+    await this.userRepository.createUser(nickname, password);
 
     return;
+  };
+
+  findByUser = async (nickname) => {
+    const findNickname = await this.userRepository.findByUser(nickname);
+
+    return findNickname;
   };
 }
 
