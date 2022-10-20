@@ -1,5 +1,5 @@
 const { Post, Like } = require('../models');
-// 여기 많아지면 안됨 ?
+
 class PostRepository {
   createPost = async (result) => {
     await Post.create(result);
