@@ -1,3 +1,10 @@
+# Layered Architecture Pattern (계층형 아키텍처 패턴)
+
+3계층 아키텍처 (3-Layered Architecture)로 구현해보려 했으며,</br>
+객체지향 프로그래밍과 객체지향 설계 5원칙(SOLID)에 맞게끔 계속적인 수정이 필요하다고 생각합니다.
+
+***
+
 # ERD
 ![ERD](./img/drawSQL-export-2022-10-12_15_32.png)
 
