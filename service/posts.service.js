@@ -34,7 +34,7 @@ class PostService {
   updatePost = async (req, res) => {
     const { postId } = req.params;
     const { user } = res.locals;
-    
+
     // 존재하는 게시글인지 repository에서 찾아온다
     const findPost = await this.postRepository.findByPost(postId);
     if (!findPost) throw new Error('존재하지 않는 게시글입니다.');
@@ -61,15 +61,21 @@ class PostService {
   };
 
   toggleLike = async (req, res) => {
-    const { postId } = req.params; // 좋아요를 하려는 게시글
+    // 좋아요를 하려는 게시글
+    const { postId } = req.params;
+
     // 존재하는 게시글인지 검증
     const findPost = await this.postRepository.findByPost(postId);
     if (!findPost) throw new Error('존재하지 않는 게시글입니다.');
 
-    const { user } = res.locals; // 로그인된 유저정보
-    const userId = user.userId; // 로그인된 유저의 ID
+    // 로그인된 유저정보
+    const { user } = res.locals;
 
-    const isLike = await this.postRepository.isLike(postId, userId); // 해당 유저가 해당 게시글에 좋아요를 눌렀는지 DB에 확인
+    // 로그인된 유저의 ID
+    const userId = user.userId;
+
+    // 해당 유저가 해당 게시글에 좋아요를 눌렀는지 DB에 확인
+    const isLike = await this.postRepository.isLike(postId, userId);
     if (!isLike) {
       await this.postRepository.createLike(postId, userId);
       res.status(200).send({ message: '게시글의 좋아요를 등록하였습니다.' });

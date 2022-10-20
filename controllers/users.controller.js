@@ -8,9 +8,6 @@ class UsersController {
 
   /**
    * 클라이언트로 부터 받은 유저정보를 검증하고 암호화 합니다.
-   * @param {*} req
-   * @param {*} res
-   * @param {*} next
    */
   createUser = async (req, res, next) => {
     try {
@@ -34,17 +31,14 @@ class UsersController {
       // hash된 유저 정보를 service로 전달
       await this.userService.createUser(users);
 
-      res.status(200).json({ message: '회원 가입에 성공하였습니다.' });
+      res.status(200).send({ message: '회원 가입에 성공하였습니다.' });
     } catch (error) {
-      res.status(error.status || 400).send({ message: error.message });
+      res.status(error.status || 400).send({ errorMessage: error.message });
     }
   };
 
   /**
    * 클라이언트로부터 받은 정보를 1차적으로 검증하고 service로 전달합니다.
-   * @param {*} req
-   * @param {*} res
-   * @param {*} next
    */
   userLogin = async (req, res, next) => {
     try {
